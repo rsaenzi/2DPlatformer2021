@@ -10333,7 +10333,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   motionSpeed: 5
   jumpForceIdle: 8
-  jumpForceMoving: 12
+  jumpForceMoving: 10
   jumpForceOnAir: 2
   maxJumpsAllowed: 2
 --- !u!4 &4040786060957214098

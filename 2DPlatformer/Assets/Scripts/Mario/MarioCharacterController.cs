@@ -11,6 +11,7 @@ public class MarioCharacterController : MonoBehaviour {
     public float jumpForceOnAir;
     public int maxJumpsAllowed;
 
+    bool marioHasShell = false;
     bool marioIsMoving = false;
     int jumpsCount = 0;
 
@@ -57,6 +58,13 @@ public class MarioCharacterController : MonoBehaviour {
             this.gameObject.GetComponent<Rigidbody2D>().AddForce(Vector2.up * forceToApply, ForceMode2D.Impulse);
             jumpsCount++;
         }
+
+
+        // Shoot
+        if (Input.GetKeyDown(KeyCode.LeftShift) && (marioHasShell == true)) {
+            this.gameObject.GetComponent<Animator>().SetBool("MarioHasShell", false);
+            marioHasShell = false;
+        }
     }
 
     void OnCollisionEnter2D(Collision2D collision) {
@@ -67,19 +75,26 @@ public class MarioCharacterController : MonoBehaviour {
             jumpsCount = 0;
         }
 
+        // Mario collects a shell
+        if (collision.gameObject.tag == "Shell") {
+            Destroy(collision.gameObject);
+            this.gameObject.GetComponent<Animator>().SetBool("MarioHasShell", true);
+            marioHasShell = true;
+        }
+
         // Mario collects a coin
         if (collision.gameObject.tag == "Coin") {
-
+            Destroy(collision.gameObject);
         }
 
         // Mario collects an egg
         if (collision.gameObject.tag == "Egg") {
-
+            Destroy(collision.gameObject);
         }
 
         // Mario collects a heart
         if (collision.gameObject.tag == "Heart") {
-
+            Destroy(collision.gameObject);
         }
 
         // Mario is hurt by a Ghost

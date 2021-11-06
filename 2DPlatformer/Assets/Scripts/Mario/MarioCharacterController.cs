@@ -10,6 +10,10 @@ public class MarioCharacterController : MonoBehaviour {
     public float jumpForceMoving;
     public float jumpForceOnAir;
     public int maxJumpsAllowed;
+    public float shootForce;
+    public GameObject shootPivotRight;
+    public GameObject shootPivotLeft;
+    public GameObject levelStartPivot;
 
     bool marioHasShell = false;
     bool marioIsMoving = false;
@@ -41,13 +45,11 @@ public class MarioCharacterController : MonoBehaviour {
 
             float forceToApply = 0.0f;
 
-            // If Mario is already jumping...
-            if (jumpsCount > 0) {
+            if (jumpsCount > 0) { // If Mario is already jumping...
                 forceToApply = jumpForceOnAir;
 
             } else {
-                // If Mario is moving horizontally...
-                if (marioIsMoving == true) {
+                if (marioIsMoving == true) { // If Mario is moving horizontally...
                     forceToApply = jumpForceMoving;
 
                 } else { // If Mario is idle...
@@ -64,6 +66,17 @@ public class MarioCharacterController : MonoBehaviour {
         if (Input.GetKeyDown(KeyCode.LeftShift) && (marioHasShell == true)) {
             this.gameObject.GetComponent<Animator>().SetBool("MarioHasShell", false);
             marioHasShell = false;
+
+            GameObject newShell = Instantiate(Resources.Load("Items/Shell") as GameObject);
+
+            if (this.gameObject.GetComponent<SpriteRenderer>().flipX == true) {
+                newShell.transform.position = shootPivotRight.transform.position;
+                newShell.GetComponent<Rigidbody2D>().AddForce(Vector2.right * shootForce, ForceMode2D.Impulse);
+            }
+            if (this.gameObject.GetComponent<SpriteRenderer>().flipX == false) {
+                newShell.transform.position = shootPivotLeft.transform.position;
+                newShell.GetComponent<Rigidbody2D>().AddForce(Vector2.left * shootForce, ForceMode2D.Impulse);
+            }
         }
     }
 
@@ -109,7 +122,7 @@ public class MarioCharacterController : MonoBehaviour {
 
         // Mario is hurt by a Blue Spike
         if (collision.gameObject.tag == "BlueSpike") {
-
+            
         }
 
         // Mario is hurt by a Red Turtle
@@ -126,5 +139,12 @@ public class MarioCharacterController : MonoBehaviour {
         if (collision.gameObject.tag == "Fall") {
 
         }
+    }
+
+    void MarioDies() {
+        //AudioPlayer.playSoundFX("MarioDies");
+        this.transform.position = levelStartPivot.transform.position;
+        this.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+        this.gameObject.GetComponent<Rigidbody2D>().angularVelocity = 0;
     }
 }

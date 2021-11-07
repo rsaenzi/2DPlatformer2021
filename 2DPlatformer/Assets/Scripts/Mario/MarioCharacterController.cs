@@ -20,6 +20,26 @@ public class MarioCharacterController : MonoBehaviour {
     int jumpsCount = 0;
 
 
+    Text textCoins;
+    Text textEggs;
+    Slider healthBar;
+
+    GameState state;
+    Animator animatorMario;
+
+
+    void Start() {
+        textCoins = GameObject.Find("Canvas/PanelCoins/TextCoins").GetComponent<Text>();
+        textEggs = GameObject.Find("Canvas/PanelEggs/TextEggs").GetComponent<Text>();
+        healthBar = GameObject.Find("Canvas/SliderHealth").GetComponent<Slider>();
+
+        state = GameObject.Find("GameState").GetComponent<GameState>();
+        animatorMario = this.gameObject.GetComponent<Animator>();
+
+        GameObject.Find("Music/Level1Grass").GetComponent<AudioSource>().Play();
+    }
+
+
     void Update() {
 
         // Motion
@@ -36,12 +56,15 @@ public class MarioCharacterController : MonoBehaviour {
             marioIsMoving = true;
         }
 
-        this.gameObject.GetComponent<Animator>().SetBool("MarioIsRunning", marioIsMoving);
+        animatorMario.SetBool("MarioIsRunning", marioIsMoving);
 
 
         // Jump
         if (Input.GetKeyDown(KeyCode.Space) && (jumpsCount < maxJumpsAllowed)) {
-            this.gameObject.GetComponent<Animator>().SetBool("MarioIsJumping", true);
+
+            GameObject.Find("SoundFx/MarioJump").GetComponent<AudioSource>().Play();
+
+            animatorMario.SetBool("MarioIsJumping", true);
 
             float forceToApply = 0.0f;
 
@@ -64,7 +87,8 @@ public class MarioCharacterController : MonoBehaviour {
 
         // Shoot
         if (Input.GetKeyDown(KeyCode.LeftShift) && (marioHasShell == true)) {
-            this.gameObject.GetComponent<Animator>().SetBool("MarioHasShell", false);
+            GameObject.Find("SoundFx/MarioShoot").GetComponent<AudioSource>().Play();
+            animatorMario.SetBool("MarioHasShell", false);
             marioHasShell = false;
 
             GameObject newShell = Instantiate(Resources.Load("Items/Shell") as GameObject);
@@ -84,67 +108,119 @@ public class MarioCharacterController : MonoBehaviour {
 
         // Mario lands on a platform
         if (collision.gameObject.tag == "Platform") {
-            this.gameObject.GetComponent<Animator>().SetBool("MarioIsJumping", false);
+            GameObject.Find("SoundFx/MarioLand").GetComponent<AudioSource>().Play();
+            animatorMario.SetBool("MarioIsJumping", false);
             jumpsCount = 0;
         }
 
         // Mario collects a shell
         if (collision.gameObject.tag == "Shell") {
             Destroy(collision.gameObject);
-            this.gameObject.GetComponent<Animator>().SetBool("MarioHasShell", true);
+            animatorMario.SetBool("MarioHasShell", true);
             marioHasShell = true;
         }
 
         // Mario collects a coin
         if (collision.gameObject.tag == "Coin") {
+            GameObject.Find("SoundFx/Coin").GetComponent<AudioSource>().Play();
             Destroy(collision.gameObject);
+
+            state.coins++;
+            textCoins.text = state.coins.ToString();
         }
 
         // Mario collects an egg
         if (collision.gameObject.tag == "Egg") {
+            GameObject.Find("SoundFx/Egg").GetComponent<AudioSource>().Play();
             Destroy(collision.gameObject);
+
+            state.eggs++;
+            textEggs.text = state.eggs.ToString();
         }
 
-        // Mario collects a heart
+        // Mario collects a heart (+2)
         if (collision.gameObject.tag == "Heart") {
+            GameObject.Find("SoundFx/Heart").GetComponent<AudioSource>().Play();
             Destroy(collision.gameObject);
+
+            state.hearts += 2;
+            healthBar.value = state.hearts;
         }
 
-        // Mario is hurt by a Ghost
+        // Mario is hurt by a Ghost (-1)
         if (collision.gameObject.tag == "Ghost") {
+            GameObject.Find("SoundFx/MarioPain").GetComponent<AudioSource>().Play();
 
+            state.hearts -= 1;
+            healthBar.value = state.hearts;
+
+            MarioDies();
         }
 
-        // Mario is hurt by a Yellow Spike
+        // Mario is hurt by a Yellow Spike (-2)
         if (collision.gameObject.tag == "YellowSpike") {
+            GameObject.Find("SoundFx/MarioPain").GetComponent<AudioSource>().Play();
 
+            state.hearts -= 2;
+            healthBar.value = state.hearts;
+
+            MarioDies();
         }
 
-        // Mario is hurt by a Blue Spike
+        // Mario is hurt by a Blue Spike (-3)
         if (collision.gameObject.tag == "BlueSpike") {
-            
+            GameObject.Find("SoundFx/MarioPain").GetComponent<AudioSource>().Play();
+
+            state.hearts -= 3;
+            healthBar.value = state.hearts;
+
+            MarioDies();
         }
 
-        // Mario is hurt by a Red Turtle
+        // Mario is hurt by a Red Turtle (-5)
         if (collision.gameObject.tag == "RedTurtle") {
+            GameObject.Find("SoundFx/MarioPain").GetComponent<AudioSource>().Play();
 
+            state.hearts -= 5;
+            healthBar.value = state.hearts;
+
+            MarioDies();
         }
 
         // Mario wins the level
         if (collision.gameObject.tag == "Door") {
-
+            GameObject.Find("SoundFx/MarioWin").GetComponent<AudioSource>().Play();
+            GameObject.Find("SoundFx/Door").GetComponent<AudioSource>().Play();
+            GameObject.Find("Music/Level1Grass").GetComponent<AudioSource>().Stop();
         }
 
         // Mario falls from the level
         if (collision.gameObject.tag == "Fall") {
+            GameObject.Find("SoundFx/MarioPain").GetComponent<AudioSource>().Play();
 
+            state.hearts = 0;
+            healthBar.value = state.hearts;
+
+            MarioDies();
         }
     }
 
+
     void MarioDies() {
-        //AudioPlayer.playSoundFX("MarioDies");
-        this.transform.position = levelStartPivot.transform.position;
-        this.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-        this.gameObject.GetComponent<Rigidbody2D>().angularVelocity = 0;
+
+        // Mario Dies
+        if (state.hearts <= 0) {
+            GameObject.Find("SoundFx/MarioPain").GetComponent<AudioSource>().Play();
+            this.gameObject.transform.position = levelStartPivot.transform.position;
+            this.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
+            this.gameObject.GetComponent<Rigidbody2D>().angularVelocity = 0;
+
+            state.hearts = 10;
+            healthBar.value = state.hearts;
+
+            animatorMario.SetBool("MarioHasShell", false);
+            marioHasShell = false;
+        }
     }
+
 }

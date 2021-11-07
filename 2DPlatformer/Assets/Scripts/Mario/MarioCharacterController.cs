@@ -11,6 +11,7 @@ public class MarioCharacterController : MonoBehaviour {
     public float jumpForceOnAir;
     public int maxJumpsAllowed;
     public float shootForce;
+
     public GameObject shootPivotRight;
     public GameObject shootPivotLeft;
     public GameObject levelStartPivot;
@@ -19,13 +20,14 @@ public class MarioCharacterController : MonoBehaviour {
     bool marioIsMoving = false;
     int jumpsCount = 0;
 
-
     Text textCoins;
     Text textEggs;
     Slider healthBar;
 
     GameState state;
     Animator animatorMario;
+    SpriteRenderer rendererMario;
+    Rigidbody2D rigidbodyMario;
 
 
     void Start() {
@@ -35,6 +37,8 @@ public class MarioCharacterController : MonoBehaviour {
 
         state = GameObject.Find("GameState").GetComponent<GameState>();
         animatorMario = this.gameObject.GetComponent<Animator>();
+        rendererMario = this.gameObject.GetComponent<SpriteRenderer>();
+        rigidbodyMario = this.gameObject.GetComponent<Rigidbody2D>();
 
         GameObject.Find("Music/Level1Grass").GetComponent<AudioSource>().Play();
     }
@@ -47,12 +51,12 @@ public class MarioCharacterController : MonoBehaviour {
 
         if (Input.GetKey(KeyCode.RightArrow)) {
             this.transform.Translate(Vector2.right * motionSpeed * Time.deltaTime, Space.World);
-            this.gameObject.GetComponent<SpriteRenderer>().flipX = true;
+            rendererMario.flipX = true;
             marioIsMoving = true;
         }
         if (Input.GetKey(KeyCode.LeftArrow)) {
             this.transform.Translate(Vector2.left * motionSpeed * Time.deltaTime, Space.World);
-            this.gameObject.GetComponent<SpriteRenderer>().flipX = false;
+            rendererMario.flipX = false;
             marioIsMoving = true;
         }
 
@@ -61,9 +65,7 @@ public class MarioCharacterController : MonoBehaviour {
 
         // Jump
         if (Input.GetKeyDown(KeyCode.Space) && (jumpsCount < maxJumpsAllowed)) {
-
             GameObject.Find("SoundFx/MarioJump").GetComponent<AudioSource>().Play();
-
             animatorMario.SetBool("MarioIsJumping", true);
 
             float forceToApply = 0.0f;
@@ -80,12 +82,12 @@ public class MarioCharacterController : MonoBehaviour {
                 }
             }
 
-            this.gameObject.GetComponent<Rigidbody2D>().AddForce(Vector2.up * forceToApply, ForceMode2D.Impulse);
+            rigidbodyMario.AddForce(Vector2.up * forceToApply, ForceMode2D.Impulse);
             jumpsCount++;
         }
 
 
-        // Shoot
+        // Shoot Shell
         if (Input.GetKeyDown(KeyCode.LeftShift) && (marioHasShell == true)) {
             GameObject.Find("SoundFx/MarioShoot").GetComponent<AudioSource>().Play();
             animatorMario.SetBool("MarioHasShell", false);
@@ -93,11 +95,11 @@ public class MarioCharacterController : MonoBehaviour {
 
             GameObject newShell = Instantiate(Resources.Load("Items/Shell") as GameObject);
 
-            if (this.gameObject.GetComponent<SpriteRenderer>().flipX == true) {
+            if (rendererMario.flipX == true) {
                 newShell.transform.position = shootPivotRight.transform.position;
                 newShell.GetComponent<Rigidbody2D>().AddForce(Vector2.right * shootForce, ForceMode2D.Impulse);
             }
-            if (this.gameObject.GetComponent<SpriteRenderer>().flipX == false) {
+            if (rendererMario.flipX == false) {
                 newShell.transform.position = shootPivotLeft.transform.position;
                 newShell.GetComponent<Rigidbody2D>().AddForce(Vector2.left * shootForce, ForceMode2D.Impulse);
             }
@@ -211,9 +213,11 @@ public class MarioCharacterController : MonoBehaviour {
         // Mario Dies
         if (state.hearts <= 0) {
             GameObject.Find("SoundFx/MarioPain").GetComponent<AudioSource>().Play();
+
             this.gameObject.transform.position = levelStartPivot.transform.position;
-            this.gameObject.GetComponent<Rigidbody2D>().velocity = Vector2.zero;
-            this.gameObject.GetComponent<Rigidbody2D>().angularVelocity = 0;
+
+            rigidbodyMario.velocity = Vector2.zero;
+            rigidbodyMario.angularVelocity = 0;
 
             state.hearts = 10;
             healthBar.value = state.hearts;
@@ -222,5 +226,4 @@ public class MarioCharacterController : MonoBehaviour {
             marioHasShell = false;
         }
     }
-
 }

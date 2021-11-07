@@ -18,7 +18,7 @@ using UnityEngine.UI;
  * UINavigation.removeAllScreens();
  * UINavigation.changeScreen("ScreenToRemove", "ScreenToShow");
  * 
-*/
+ */
 
 public class UINavigation {
 

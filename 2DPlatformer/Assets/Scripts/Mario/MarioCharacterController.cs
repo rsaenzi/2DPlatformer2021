@@ -39,8 +39,6 @@ public class MarioCharacterController : MonoBehaviour {
         animatorMario = this.gameObject.GetComponent<Animator>();
         rendererMario = this.gameObject.GetComponent<SpriteRenderer>();
         rigidbodyMario = this.gameObject.GetComponent<Rigidbody2D>();
-
-        GameObject.Find("Music/Level1Grass").GetComponent<AudioSource>().Play();
     }
 
 
@@ -72,11 +70,9 @@ public class MarioCharacterController : MonoBehaviour {
 
             if (jumpsCount > 0) { // If Mario is already jumping...
                 forceToApply = jumpForceOnAir;
-
             } else {
                 if (marioIsMoving == true) { // If Mario is moving horizontally...
                     forceToApply = jumpForceMoving;
-
                 } else { // If Mario is idle...
                     forceToApply = jumpForceIdle;
                 }
@@ -155,7 +151,6 @@ public class MarioCharacterController : MonoBehaviour {
 
             state.hearts -= 1;
             healthBar.value = state.hearts;
-
             MarioDies();
         }
 
@@ -165,7 +160,6 @@ public class MarioCharacterController : MonoBehaviour {
 
             state.hearts -= 2;
             healthBar.value = state.hearts;
-
             MarioDies();
         }
 
@@ -175,7 +169,6 @@ public class MarioCharacterController : MonoBehaviour {
 
             state.hearts -= 3;
             healthBar.value = state.hearts;
-
             MarioDies();
         }
 
@@ -185,15 +178,7 @@ public class MarioCharacterController : MonoBehaviour {
 
             state.hearts -= 5;
             healthBar.value = state.hearts;
-
             MarioDies();
-        }
-
-        // Mario wins the level
-        if (collision.gameObject.tag == "Door") {
-            GameObject.Find("SoundFx/MarioWin").GetComponent<AudioSource>().Play();
-            GameObject.Find("SoundFx/Door").GetComponent<AudioSource>().Play();
-            GameObject.Find("Music/Level1Grass").GetComponent<AudioSource>().Stop();
         }
 
         // Mario falls from the level
@@ -202,8 +187,13 @@ public class MarioCharacterController : MonoBehaviour {
 
             state.hearts = 0;
             healthBar.value = state.hearts;
-
             MarioDies();
+        }
+
+        // Mario wins the level
+        if (collision.gameObject.tag == "Door") {
+            GameObject.Find("SoundFx/MarioWin").GetComponent<AudioSource>().Play();
+            GameObject.Find("SoundFx/Door").GetComponent<AudioSource>().Play();
         }
     }
 

@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 3803450284380262922}
   - component: {fileID: 3803450284380262916}
   - component: {fileID: 3803450284380262917}
+  - component: {fileID: 4618124131642604588}
+  - component: {fileID: 5767683191881536932}
   m_Layer: 5
   m_Name: ScreenVideo
   m_TagString: Untagged
@@ -70,7 +72,7 @@ VideoPlayer:
   m_TargetAudioSources:
   - {fileID: 0}
   m_DirectAudioVolumes:
-  - 1
+  - 0.6
   m_Url: 
   m_EnabledAudioTracks: 01
   m_DirectAudioMutes: 00
@@ -81,6 +83,30 @@ VideoPlayer:
   m_WaitForFirstFrame: 1
   m_FrameReadyEventEnabled: 0
   m_VideoShaders: []
+--- !u!114 &4618124131642604588
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3803450284380262923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4809e609ee014dde9eb06aa014f5d6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5767683191881536932
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3803450284380262923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9426a6ddcdd0c430a9c1381e408d5ded, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5934608289894613183
 GameObject:
   m_ObjectHideFlags: 0
@@ -281,7 +307,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 144095095156190845}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 4618124131642604588}
+        m_TargetAssemblyTypeName: UIButtonEvents, Assembly-CSharp
+        m_MethodName: ScreenVideoButtonSkip
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &8969379823397544025
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -8,12 +8,14 @@ public class Shell : MonoBehaviour {
 
         // Shell collider with Ghost or Red Turtle
         if (collision.gameObject.tag == "Ghost" || collision.gameObject.tag == "RedTurtle") {
+            AudioPlayer.playSoundFX("ShellImpact");
             Destroy(collision.gameObject);
             Destroy(this.gameObject);
         }
 
         // Shell collider with Spikes
         if (collision.gameObject.tag == "YellowSpike" || collision.gameObject.tag == "BlueSpike") {
+            AudioPlayer.playSoundFX("ShellImpact");
             Destroy(this.gameObject);
         }
     }

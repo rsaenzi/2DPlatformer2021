@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 5237674395918794015}
   - component: {fileID: 5237674395918794013}
   - component: {fileID: 5237674395918794012}
+  - component: {fileID: 5657026483619176915}
+  - component: {fileID: 3024808185978680634}
   m_Layer: 5
   m_Name: ScreenSplash
   m_TagString: Untagged
@@ -75,3 +77,27 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5657026483619176915
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5237674395918794014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4809e609ee014dde9eb06aa014f5d6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3024808185978680634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5237674395918794014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9003b20099d394ea1a81587c3e9f2c3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

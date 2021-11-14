@@ -6,36 +6,38 @@ using UnityEngine.UI;
 public class MarioCharacterController : MonoBehaviour {
 
     public float motionSpeed;
-    public float jumpForceIdle;
-    public float jumpForceMoving;
-    public float jumpForceOnAir;
-    public int maxJumpsAllowed;
     public float shootForce;
+    public float jumpForce;
 
     public GameObject shootPivotRight;
     public GameObject shootPivotLeft;
     public GameObject levelStartPivot;
 
+    float keyHorizontalValue = 0.0f;
+
     bool marioHasShell = false;
     bool marioIsMoving = false;
-    int jumpsCount = 0;
+    bool marioIsJumping = false;
 
     Text textCoins;
     Text textEggs;
     Slider healthBar;
 
     GameState state;
+    GameObject shellPrefab;
     Animator animatorMario;
     SpriteRenderer rendererMario;
     Rigidbody2D rigidbodyMario;
 
 
     void Start() {
+
         textCoins = GameObject.Find("Canvas/ScreenHUD/PanelCoins/TextCoins").GetComponent<Text>();
         textEggs = GameObject.Find("Canvas/ScreenHUD/PanelEggs/TextEggs").GetComponent<Text>();
         healthBar = GameObject.Find("Canvas/ScreenHUD/SliderHealth").GetComponent<Slider>();
 
         state = GameObject.Find("GameState").GetComponent<GameState>();
+        shellPrefab = Resources.Load("Items/Shell") as GameObject;
         animatorMario = this.gameObject.GetComponent<Animator>();
         rendererMario = this.gameObject.GetComponent<SpriteRenderer>();
         rigidbodyMario = this.gameObject.GetComponent<Rigidbody2D>();
@@ -44,52 +46,22 @@ public class MarioCharacterController : MonoBehaviour {
 
     void Update() {
 
-        // Motion
-        marioIsMoving = false;
-
-        if (Input.GetKey(KeyCode.RightArrow)) {
-            this.transform.Translate(Vector2.right * motionSpeed * Time.deltaTime, Space.World);
-            rendererMario.flipX = true;
-            marioIsMoving = true;
-        }
-        if (Input.GetKey(KeyCode.LeftArrow)) {
-            this.transform.Translate(Vector2.left * motionSpeed * Time.deltaTime, Space.World);
-            rendererMario.flipX = false;
-            marioIsMoving = true;
-        }
-
-        animatorMario.SetBool("MarioIsRunning", marioIsMoving);
-
-
         // Jump
-        if (Input.GetKeyDown(KeyCode.Space) && (jumpsCount < maxJumpsAllowed)) {
+        if ((Mathf.Abs(Input.GetAxis("Jump")) > 0.001f) && (marioIsJumping == false)) {
             AudioPlayer.playSoundFX("MarioJump");
             animatorMario.SetBool("MarioIsJumping", true);
-
-            float forceToApply = 0.0f;
-
-            if (jumpsCount > 0) { // If Mario is already jumping...
-                forceToApply = jumpForceOnAir;
-            } else {
-                if (marioIsMoving == true) { // If Mario is moving horizontally...
-                    forceToApply = jumpForceMoving;
-                } else { // If Mario is idle...
-                    forceToApply = jumpForceIdle;
-                }
-            }
-
-            rigidbodyMario.AddForce(Vector2.up * forceToApply, ForceMode2D.Impulse);
-            jumpsCount++;
+            rigidbodyMario.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            marioIsJumping = true;
         }
 
 
         // Shoot Shell
-        if (Input.GetKeyDown(KeyCode.LeftShift) && (marioHasShell == true)) {
+        if ((Mathf.Abs(Input.GetAxis("Fire1")) > 0.001f) && (marioHasShell == true)) {
             AudioPlayer.playSoundFX("MarioShoot");
             animatorMario.SetBool("MarioHasShell", false);
             marioHasShell = false;
 
-            GameObject newShell = Instantiate(Resources.Load("Items/Shell") as GameObject);
+            GameObject newShell = Instantiate(shellPrefab);
 
             if (rendererMario.flipX == true) {
                 newShell.transform.position = shootPivotRight.transform.position;
@@ -102,13 +74,34 @@ public class MarioCharacterController : MonoBehaviour {
         }
     }
 
+    void FixedUpdate() {
+
+        // Motion
+        marioIsMoving = false;
+        keyHorizontalValue = Input.GetAxis("Horizontal");
+
+        if (Mathf.Abs(keyHorizontalValue) > 0.001f) {
+            marioIsMoving = true;
+            rigidbodyMario.velocity = new Vector2(keyHorizontalValue * motionSpeed, rigidbodyMario.velocity.y); ;
+
+            // Look to Right or Left
+            if (keyHorizontalValue > 0.0f) {
+                rendererMario.flipX = true;
+            } else {
+                rendererMario.flipX = false;
+            }
+        }
+
+        animatorMario.SetBool("MarioIsRunning", marioIsMoving);
+    }
+
     void OnCollisionEnter2D(Collision2D collision) {
 
         // Mario lands on a platform
         if (collision.gameObject.tag == "Platform") {
             AudioPlayer.playSoundFX("MarioLand");
             animatorMario.SetBool("MarioIsJumping", false);
-            jumpsCount = 0;
+            marioIsJumping = false;
         }
 
         // Mario collects a shell
@@ -137,7 +130,7 @@ public class MarioCharacterController : MonoBehaviour {
             textEggs.text = state.eggs.ToString();
         }
 
-        // Mario collects a heart (+2)
+        // Mario collects a heart (+2 health point)
         if (collision.gameObject.tag == "Heart") {
             AudioPlayer.playSoundFX("Heart");
             Destroy(collision.gameObject);
@@ -146,7 +139,7 @@ public class MarioCharacterController : MonoBehaviour {
             healthBar.value = state.hearts;
         }
 
-        // Mario is hurt by a Ghost (-1)
+        // Mario is hurt by a Ghost (-1 health point)
         if (collision.gameObject.tag == "Ghost") {
             AudioPlayer.playSoundFX("MarioPain");
 
@@ -155,7 +148,7 @@ public class MarioCharacterController : MonoBehaviour {
             MarioDies();
         }
 
-        // Mario is hurt by a Yellow Spike (-2)
+        // Mario is hurt by a Yellow Spike (-2 health point)
         if (collision.gameObject.tag == "YellowSpike") {
             AudioPlayer.playSoundFX("MarioPain");
 
@@ -164,7 +157,7 @@ public class MarioCharacterController : MonoBehaviour {
             MarioDies();
         }
 
-        // Mario is hurt by a Blue Spike (-3)
+        // Mario is hurt by a Blue Spike (-3 health point)
         if (collision.gameObject.tag == "BlueSpike") {
             AudioPlayer.playSoundFX("MarioPain");
 
@@ -173,7 +166,7 @@ public class MarioCharacterController : MonoBehaviour {
             MarioDies();
         }
 
-        // Mario is hurt by a Red Turtle (-5)
+        // Mario is hurt by a Red Turtle (-5 health point)
         if (collision.gameObject.tag == "RedTurtle") {
             AudioPlayer.playSoundFX("MarioPain");
 
@@ -204,7 +197,7 @@ public class MarioCharacterController : MonoBehaviour {
         }
     }
 
-    void MarioDies() {
+    private void MarioDies() {
 
         // Mario Dies
         if (state.hearts <= 0) {

@@ -5,10 +5,10 @@ using UnityEngine;
 public class ScreenWin : MonoBehaviour {
 
     void Start() {
-        Invoke("playMusicUINavigation", 6);
+        Invoke("playUIMusic", 6.5f);
     }
 
-    void playMusicUINavigation() {
+    void playUIMusic() {
         AudioPlayer.playMusic("UINavigation");
     }
 }

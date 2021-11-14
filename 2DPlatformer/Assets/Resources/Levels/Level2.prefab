@@ -9727,12 +9727,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f1187bc4bcea9464a90c1bde9bb47948, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  motionSpeed: 5
-  jumpForceIdle: 8
-  jumpForceMoving: 10
-  jumpForceOnAir: 2
-  maxJumpsAllowed: 1
-  shootForce: 5
+  motionSpeed: 6
+  shootForce: 6
+  jumpForce: 8
   shootPivotRight: {fileID: 6420789594858753506}
   shootPivotLeft: {fileID: 6420789594978564836}
   levelStartPivot: {fileID: 6420789594580039175}

@@ -7,10 +7,10 @@ public class SetupVideoScreen : MonoBehaviour {
 
     void Start() {
         this.gameObject.GetComponent<VideoPlayer>().targetCamera = GameObject.Find("CameraUI").GetComponent<Camera>();
-        this.gameObject.GetComponent<VideoPlayer>().loopPointReached += VideoFinalizado;
+        this.gameObject.GetComponent<VideoPlayer>().loopPointReached += VideoFinished;
     }
 
-    void VideoFinalizado(VideoPlayer player) {
+    void VideoFinished(VideoPlayer player) {
         UINavigation.changeScreen("ScreenVideo", "ScreenMenu");
         AudioPlayer.playMusic("UINavigation");
     }
